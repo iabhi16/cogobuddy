@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <FirebaseArduino.h>
-#define FIREBASE_HOST "example.firebaseio.com"
-#define FIREBASE_AUTH "token_or_secret"
+#define FIREBASE_HOST "coalmine-e9ae6.firebaseio.com"
+#define FIREBASE_AUTH "BKJFBti484rARdtXwbX4YpHNd3aCi6FDLTU25STf"
 #define WIFI_SSID "sdiot@abhi"
 #define WIFI_PASSWORD "sdiot123"
 #include <XBee.h>
