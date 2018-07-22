@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+    <meta charset="utf-8" />
+  <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyD69O9TbsQ-BjC48TsuBwvP3r0pwxwkuE4",
+        authDomain: "coalmine-e9ae6.firebaseapp.com",
+        databaseURL: "https://coalmine-e9ae6.firebaseio.com",
+        projectId: "coalmine-e9ae6",
+        storageBucket: "",
+        messagingSenderId: "601640003236"
+      };
+      firebase.initializeApp(config);
+      </script>
+
+
+
+    <link rel="stylesheet" href="https://api.mazemap.com/js/v2.0.9/mazemap.min.css">
+    <script type='text/javascript' src='https://api.mazemap.com/js/v2.0.9/mazemap.min.js'></script>
+
+    <style>
+    #map{
+      margin-top: 300px;
+      margin-left: 0px;
+      height: 410px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+        position: bottom;
+    }
+    h1{
+      color: white;
+      text-align: center;
+    }
+    img{
+      position: absolute;
+      left:80%;
+      bottom: 75%;
+
+      height: 200px;
+      width: 300px;
+
+    }
+
+    #alert
+    {
+      background-color: red;
+      border-radius: 30px;
+      padding: 10px 10px;
+      font-size: 25px;
+      margin-top: 20px;
+      margin-left: 350px;
+    }
+    #medical
+    {
+      background-color: #77a8a8;
+      border-radius: 30px;
+      padding: 10px 10px;
+      font-size: 25px;
+      margin-left: 80px;
+    }
+    #abort
+    {
+      background-color: yellow;
+      border-radius: 30px;
+      padding: 10px 10px;
+      font-size: 25px;
+      margin-left: 80px;
+    }
+    #node1
+    {
+      background-color: grey;
+      border-radius: 0px;
+      padding: 10px 10px;
+      font-size: 30px;
+      margin-left: 0px;
+      color: white;
+      border: 5px solid white;
+    }
+    #node2
+    {
+      background-color: grey;
+      border-radius: 0px;
+      padding: 10px 10px;
+      font-size: 30px;
+      margin-left: 0px;
+      color: white;
+      border: 5px solid white;
+    }
+
+    #node3
+    {
+      background-color: grey;
+      border-radius: 0px;
+      padding: 10px 10px;
+      font-size: 30px;
+      margin-left: 0px;
+      color: white;
+      border: 5px solid white;
+    }
+
+    #node4
+    {
+      background-color: grey;
+      border-radius: 0px;
+      padding: 10px 10px;
+      font-size: 30px;
+      color: white;
+      margin-left: 200px;
+      border: 5px solid white;
+    }
+    #methane{
+      border-radius: 90%;
+      padding: 25px 25px;
+      background-color: green;
+      margin-left: 350px;
+    }
+
+    #meth{
+      font-size: 20px;
+
+    }
+
+    #quality{
+
+      border-radius: 90%;
+      padding: 25px 25px;
+      background-color: green;
+      margin-left: 100px;
+
+    }
+
+    #qual{
+      font-size: 20px;
+    }
+
+    #panic{
+      border-radius: 90%;
+      padding: 25px 25px;
+      background-color: green;
+      margin-left: 100px;
+    }
+
+    #pan{
+      font-size: 20px;
+    }
+    span {
+      font-size: 35px;
+      color: white;
+    }
+
+    body{
+      background-color: black;
+    }
+        /*body { margin:0px; padding:0px; width: 100%; height:100%; }*/
+    </style>
+</head>
+<body>
+    <div id="map" class="mazemap"></div>
+    <h1>COAL MINE MONITORING SYSTEM</h1>
+    <button id="methane"> </button><span id="meth">    METHANE</span>
+    <button id="quality"> </button><span id="qual">  AIR QUALITY</span>
+    <button id="panic"></button><span id="pan">  PANIC</span>
+    <br><br><br><br><br><br>
+    <button id="node4"> NODE 4</button><span>-->-->--></span>
+    <button id="node3"> NODE 3</button><span>-->-->--></span>
+    <button id="node2"> NODE 2</button><span>-->-->--></span>
+    <button id="node1"> NODE 1</button><span>
+    <img src = "https://www.thehindu.com/business/Industry/article18950917.ece/alternates/FREE_660/10THBUCOAL1"  >
+    <br><br><br><br><br><br><br><br><br><br><br><br>
+    <button id="alert"> ALERT</button>
+    <button id="medical"> MEDICAL ASSISTANCE</button>
+    <button id="abort"> ABORT</button>
+
+    <script>
+
+    var Latref = firebase.database().ref('Coordinates/'+'LAT/');
+    var Lngref = firebase.database().ref('Coordinates/'+'LNG/');
+    var methane = firebase.database().ref('Coordinates/'+'Methane/');
+    var air = firebase.database().ref('Coordinates/'+'Quality/');
+    var Panic = firebase.database().ref('Coordinates/'+'Panic/');
+    var inuse = firebase.database().ref('InUse/');
+    var LAT;
+
+    methane.on('value',function(Snapshot)
+    {
+      var val = parseInt(Snapshot.val(),10);
+      if(val==1)
+      {
+        document.getElementById('methane').style.backgroundColor='Red';
+        //document.getElementById('node2').style.backgroundColor='Grey';
+      }
+      else {
+        document.getElementById('methane').style.backgroundColor='Green';
+          //document.getElementById('node2').style.backgroundColor='Grey';
+
+      }
+
+    });
+
+    air.on('value',function(Snapshot)
+    {
+      var val = parseInt(Snapshot.val(),10);
+      if(val==1)
+      {document.getElementById('quality').style.backgroundColor='Red';
+        //document.getElementById('node2').style.backgroundColor='Grey';
+      }
+      else {
+        document.getElementById('quality').style.backgroundColor='Green';
+          //document.getElementById('node2').style.backgroundColor='Grey';
+
+      }
+
+    });
+
+    Panic.on('value',function(Snapshot)
+    {
+      var val = parseInt(Snapshot.val(),10);
+      if(val==1)
+      {document.getElementById('panic').style.backgroundColor='Red';
+        //document.getElementById('node2').style.backgroundColor='Grey';
+      }
+      else {
+        document.getElementById('panic').style.backgroundColor='Green';
+          //document.getElementById('node2').style.backgroundColor='Grey';
+
+      }
+
+    });
+    Latref.on('value', function(Snapshot) {
+
+      inuse.on('value',function(Snapshot)
+      {
+        var val = parseInt(Snapshot.val(),10);
+        if(val==1)
+        {document.getElementById('node1').style.backgroundColor='Red';
+          document.getElementById('node2').style.backgroundColor='Grey';
+        }
+
+        else if(val==2)
+        {
+          document.getElementById('node2').style.backgroundColor='Red';
+          document.getElementById('node1').style.backgroundColor='Grey';
+        }
+      }
+
+    );
+
+      LAT = Snapshot.val();
+      LAT= parseFloat(LAT);
+      var change = LAT;
+
+      //document.getElementById('abort').style.backgroundColor='Red';
+
+      var startLngLat = {lng: -78.49768773040183, lat: 38.04116378463950};
+      var destLngLat = {lng:-78.4983511896671 , lat: LAT};
+
+
+      var markers = [
+          {
+              lngLat: {lng: -78.49768773040183, lat: 38.04116378463950},
+              options: {
+                  color: 'MazePink',
+                  size: 44,
+                  glyphColor:'#FFF',
+                  glyph: '1',
+                  innerCircle: false,
+                  zLevel: 1
+              }
+          },
+
+
+
+
+          {
+            lngLat: {lng: -78.4983511896671, lat: 38.04119740262034},
+            options: {
+                color: 'MazePink',
+                size: 44,
+                glyphColor:'#FFF',
+                glyph: '2',
+                innerCircle: false,
+                zLevel: 1
+              }
+          },
+
+          {lngLat: {lng: -78.4990511896671, lat: 38.04119740262034},
+          options: {
+              color: 'MazePink',
+              size: 44,
+              glyphColor:'#FFF',
+              glyph: '3',
+              innerCircle: false,
+              zLevel: 1
+            }
+        },
+
+        {lngLat: {lng: -78.4998811896671, lat: 38.04119740262034},
+        options: {
+            color: 'MazePink',
+            size: 44,
+            glyphColor:'#FFF',
+            glyph: '4',
+            innerCircle: false,
+            zLevel: 1
+          }
+      }
+
+      ];
+
+          var myMap = new Mazemap.Map({
+              container: 'map',
+              campuses: 50,
+              center: {lng: -78.498687681583, lat: 38.03117367004216},
+              zoom: 19.7,
+              scrollZoom: true,
+              doubleClickZoom: false,
+              touchZoomRotate: true,
+              zLevelControl: false
+          });
+          var zoomInOutBool = false;
+        var mapZoom = 18.837;
+
+        myMap.addControl(new Mazemap.mapboxgl.NavigationControl());
+
+          myMap.on('load', function(){
+            addMarkers();
+              // MazeMap ready
+              var blueDot = new Mazemap.BlueDot( {
+                accuracyCircle: true,
+                zLevel: 1
+            } ).setLngLat( startLngLat).setAccuracy(2).addTo(myMap);
+
+
+
+            function setNewPosition(){
+
+               var newLngLat = calcLinearLatLng(startLngLat, destLngLat, 5);
+
+               blueDot.setLngLat(newLngLat, {animate: true, duration: 400});
+
+               myMap.flyTo({ center: newLngLat, duration: 400, easing: function(a){
+                   return a;
+               }});
+           }
+
+           function setNewAccuracy(){
+               var accuracy = Math.random() * 3 + 10;
+               blueDot.setAccuracy(accuracy);
+           }
+
+           setInterval(setNewPosition, 250);
+           setInterval(setNewAccuracy, 2000);
+
+           setInterval(toggleZoomInOut, 5000);
+
+
+
+
+
+
+            // Initialize a Highlighter for POIs
+            // Storing the object on the map just makes it easy to access for other things
+
+
+
+
+          });
+          function toggleZoomInOut(){
+            zoomInOutBool = !zoomInOutBool;
+
+            if(zoomInOutBool){
+                mapZoom = 20.5;
+            }else{
+                mapZoom = 18.837;
+            };
+        }
+
+        // Returns a linear moving point along the line between startLatLng and endLatLng given a speed factor
+        function calcLinearLatLng(startLatLng, endLatLng, speed){
+
+            var startPoint = myMap.project(startLatLng);
+            var endPoint = myMap.project(endLatLng);
+
+            var dX = endPoint.x - startPoint.x;
+            var dY = endPoint.y - startPoint.y;
+
+            var now = performance.now();
+
+            var lengthTime = speed * 1000;
+
+            var timeFraction = (now % lengthTime) / lengthTime;
+
+            var fractionX = dX * timeFraction;
+            var fractionY = dY * timeFraction;
+
+            var fractionPoint = new Mazemap.mapboxgl.Point(fractionX, fractionY);
+
+
+            //Alternate the direction
+            var direction = Math.floor( now / lengthTime) % 2 ;
+
+            var calcPoint;
+           if(direction){
+                calcPoint = endPoint.sub(fractionPoint);
+          }else{
+                calcPoint = startPoint.add(fractionPoint);
+            }
+            var calcLatLng = myMap.unproject(calcPoint);
+
+            return calcLatLng;
+        }
+
+
+
+
+        // Returns a linear moving point along the line between startLatLng and endLatLng given a speed factor
+
+
+          function addMarkers(){
+              var i, lngLat, marker;
+
+
+
+              var allMarkers = [];
+              for(i = 0; i < markers.length; i++){
+                  lngLat = markers[i].lngLat;
+                  options = markers[i].options;
+
+                  var marker = new Mazemap.MazeMarker( options ).setLngLat( lngLat ).addTo(myMap);
+                  allMarkers.push(marker);
+              }
+
+              // Zoom to bounds of all markers
+              var bounds = new Mazemap.mapboxgl.LngLatBounds();
+              allMarkers.forEach( (marker) => {
+                  bounds.extend( marker.getLngLat() );
+              });
+              myMap.fitBounds(bounds, {padding: 100});
+
+          }
+
+
+    });
+
+    //var LAT =-78.49867020323919;
+
+
+    </script>
+</body>
